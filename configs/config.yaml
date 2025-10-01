@@ -1,0 +1,5 @@
+addr: ":8080"
+signingKey: "change-me"
+tokenTTL: "3h"
+baseURL: ""
+

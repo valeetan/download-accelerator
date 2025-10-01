@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>下载加速代理</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <meta name="robots" content="noindex" />
+</head>
+<body>
+  <div class="container">
+    <h1>下载加速代理</h1>
+    <p>输入源文件 URL，生成带有效期的加速下载链接。</p>
+    <form method="post" action="/">
+      <input type="url" name="source" placeholder="https://example.com/file.iso" required />
+      <button type="submit">生成</button>
+    </form>
+    <div id="result"></div>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
+

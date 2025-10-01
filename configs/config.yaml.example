@@ -1,0 +1,6 @@
+# 示例配置，复制为 configs/config.yaml 并按需修改
+addr: ":8080"
+signingKey: "change-me"
+tokenTTL: "3h"    # 支持 Go duration 格式，如 90m、24h
+baseURL: ""       # 如 https://dl.example.com
+
