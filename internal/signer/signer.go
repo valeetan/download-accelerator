@@ -69,6 +69,12 @@ func BuildAbsolute(baseURL, signedPath string) string {
 	if baseURL == "" {
 		return signedPath
 	}
+
+	// 如果 baseURL 没有协议前缀，自动添加 https://
+	if !isAbsURL(baseURL) {
+		baseURL = "https://" + baseURL
+	}
+
 	bu, err := url.Parse(baseURL)
 	if err != nil {
 		return baseURL + signedPath

@@ -93,8 +93,9 @@ func (lc *LinkController) Proxy(c *gin.Context) {
 	p := service.NewProxyService(lc.cfg.HTTPTimeout, lc.cfg.MaxConcurrent)
 	p.SetThrottle(lc.cfg.ThrottleBps)
 
-	// 查询 links 记录
+	// 查询 links 记录和文件元数据
 	var linkID int64
+	var filename string
 	if s := c.Request.URL; s != nil {
 		// 用路径+查询作为键
 		if lc.service != nil && lc.service.DB() != nil {
@@ -104,13 +105,23 @@ func (lc *LinkController) Proxy(c *gin.Context) {
 				if cfp, _ := c.Cookie("fp"); cfp != "" && fp != "" && cfp != fp {
 					_ = lc.service.DB().InsertLinkEvent(c, linkID, c.ClientIP(), c.Request.UserAgent(), cfp, 0, true)
 				}
+
+				// 查询文件元数据获取正确的文件名
+				if meta, err := lc.service.DB().GetBySourceURL(c, source); err == nil && meta != nil {
+					filename = meta.Filename
+				}
 			}
 		}
 	}
 
-	n, _ := p.ProxyWithCount(c.Request.Context(), source, c.Writer, c.Request)
-	if linkID > 0 && lc.service != nil && lc.service.DB() != nil {
-		cfp, _ := c.Cookie("fp")
-		_ = lc.service.DB().InsertLinkEvent(c, linkID, c.ClientIP(), c.Request.UserAgent(), cfp, n, false)
+	// 使用带文件名的代理方法
+	if filename != "" {
+		_ = p.ProxyWithFilename(c.Request.Context(), source, filename, c.Writer, c.Request)
+	} else {
+		n, _ := p.ProxyWithCount(c.Request.Context(), source, c.Writer, c.Request)
+		if linkID > 0 && lc.service != nil && lc.service.DB() != nil {
+			cfp, _ := c.Cookie("fp")
+			_ = lc.service.DB().InsertLinkEvent(c, linkID, c.ClientIP(), c.Request.UserAgent(), cfp, n, false)
+		}
 	}
 }
