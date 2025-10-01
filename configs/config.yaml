@@ -1,5 +1,15 @@
 addr: ":8080"
-signingKey: "change-me"
+signingKey: "8d3a0eb03631a2e24bf928a8ad6a18ab"
 tokenTTL: "3h"
-baseURL: ""
+baseURL: "dw.toastlive.cn"
+dbPath: "data/app.db"
+httpTimeout: "15s"
+maxConcurrent: 16
+adminUser: 'tanshan'
+adminPass: 'tanshan0411'
+# 限速配置
+throttleBps: 0    # 代理下载限速，字节/秒，0表示不限速
 
+# 指纹限制策略
+fingerprintLimitPerHour: 10    # 每指纹每小时生成链接限制
+restrictToSameFingerprint: true  # 是否仅允许同指纹下载

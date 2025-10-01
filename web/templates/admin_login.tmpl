@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>管理员登录</title>
+</head>
+<body class="bg-slate-950 text-slate-100">
+  <div class="max-w-md mx-auto p-6">
+    <h1 class="text-2xl font-semibold mb-6">管理员登录</h1>
+    {{ if .err }}<div class="mb-4 text-red-400">{{ .err }}</div>{{ end }}
+    <form method="post" action="/admin/login" class="space-y-4">
+      <div>
+        <label class="block text-sm mb-1">用户名</label>
+        <input name="username" class="w-full px-3 py-2 rounded-md bg-slate-900 border border-slate-700" />
+      </div>
+      <div>
+        <label class="block text-sm mb-1">密码</label>
+        <input type="password" name="password" class="w-full px-3 py-2 rounded-md bg-slate-900 border border-slate-700" />
+      </div>
+      <button class="px-4 py-2 bg-sky-500 hover:bg-sky-600 rounded-md">登录</button>
+    </form>
+  </div>
+</body>
+</html>
+
+
+

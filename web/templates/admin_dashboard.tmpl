@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>仪表盘</title>
+</head>
+<body class="bg-slate-950 text-slate-100">
+  <div class="max-w-6xl mx-auto p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-semibold">仪表盘</h1>
+      <div class="space-x-4">
+        <a href="/admin/links" class="px-4 py-2 bg-sky-500 hover:bg-sky-600 rounded-md">链接列表</a>
+        <form method="post" action="/admin/logout" class="inline">
+          <button type="submit" class="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-md">退出</button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- 统计卡片 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div class="rounded-lg border border-slate-800 bg-slate-900 p-4">
+        <div class="text-slate-400">总生成</div>
+        <div class="text-2xl font-bold">{{ .stat.Count }}</div>
+      </div>
+      <div class="rounded-lg border border-slate-800 bg-slate-900 p-4">
+        <div class="text-slate-400">有效</div>
+        <div class="text-2xl font-bold text-green-400">{{ .stat.Active }}</div>
+      </div>
+      <div class="rounded-lg border border-slate-800 bg-slate-900 p-4">
+        <div class="text-slate-400">过期</div>
+        <div class="text-2xl font-bold text-red-400">{{ .stat.Expired }}</div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- 24小时趋势 -->
+      <div class="rounded-lg border border-slate-800 bg-slate-900 p-4">
+        <h3 class="text-lg font-medium mb-4">近24小时下载趋势</h3>
+        <div class="space-y-2">
+          {{ range .stats24h }}
+          <div class="flex justify-between items-center">
+            <span class="text-sm">{{ .Hour }}:00</span>
+            <div class="flex items-center space-x-4">
+              <span class="text-sm text-slate-400">{{ .Count }}次</span>
+              <span class="text-sm text-slate-400 bytes-display" data-bytes="{{ .Bytes }}">{{ .Bytes }} B</span>
+            </div>
+          </div>
+          {{ end }}
+        </div>
+      </div>
+
+      <!-- Top源站 -->
+      <div class="rounded-lg border border-slate-800 bg-slate-900 p-4">
+        <h3 class="text-lg font-medium mb-4">热门源站</h3>
+        <div class="space-y-2">
+          {{ range .topSources }}
+          <div class="flex justify-between items-center">
+            <span class="text-sm truncate max-w-xs">{{ .SourceURL }}</span>
+            <div class="flex items-center space-x-4">
+              <span class="text-sm text-slate-400">{{ .Count }}次</span>
+              <span class="text-sm text-slate-400 bytes-display" data-bytes="{{ .Bytes }}">{{ .Bytes }} B</span>
+            </div>
+          </div>
+          {{ end }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
+    
+    // 页面加载后格式化所有字节显示
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.bytes-display').forEach(function(el) {
+        const bytes = parseInt(el.getAttribute('data-bytes'));
+        el.textContent = formatBytes(bytes);
+      });
+    });
+  </script>
+</body>
+</html>
+
+
+

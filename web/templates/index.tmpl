@@ -4,18 +4,32 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>下载加速代理</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/static/style.css" />
   <meta name="robots" content="noindex" />
 </head>
 <body>
-  <div class="container">
-    <h1>下载加速代理</h1>
-    <p>输入源文件 URL，生成带有效期的加速下载链接。</p>
-    <form method="post" action="/">
-      <input type="url" name="source" placeholder="https://example.com/file.iso" required />
-      <button type="submit">生成</button>
+  <div class="max-w-3xl mx-auto p-6">
+    <h1 class="text-2xl font-semibold text-slate-100 mb-2">下载加速代理</h1>
+    <p class="text-slate-400 mb-6">输入源文件 URL，生成带有效期的加速下载链接。</p>
+    <form method="post" action="/" class="flex gap-3">
+      <input type="url" name="source" class="flex-1 px-3 py-2 rounded-md bg-slate-900 border border-slate-700 text-slate-100" placeholder="https://example.com/file.iso" required />
+      <button type="submit" class="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md">生成</button>
     </form>
-    <div id="result"></div>
+    <div id="result" class="mt-6"></div>
+    <template id="tpl-result">
+      <div class="rounded-lg border border-slate-700 bg-slate-900 p-4">
+        <h3 class="text-lg font-medium text-slate-100 mb-3">元数据</h3>
+        <div class="text-slate-300 space-y-1">
+          <p><span class="text-slate-400">文件名：</span><span data-k="filename"></span></p>
+          <p><span class="text-slate-400">大小：</span><span data-k="size"></span></p>
+        </div>
+        <div class="flex gap-3 mt-4">
+          <button type="button" id="btnCopy" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-md">复制链接</button>
+          <a id="btnDownload" class="px-3 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md" target="_blank">下载</a>
+        </div>
+      </div>
+    </template>
   </div>
   <script src="/static/app.js"></script>
 </body>

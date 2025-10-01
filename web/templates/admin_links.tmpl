@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>链接列表</title>
+</head>
+<body class="bg-slate-950 text-slate-100">
+  <div class="max-w-6xl mx-auto p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-semibold">链接列表</h1>
+      <div class="space-x-4">
+        <a href="/admin" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 rounded-md">仪表盘</a>
+        <form method="post" action="/admin/logout" class="inline">
+          <button type="submit" class="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-md">退出</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="rounded-lg border border-slate-800 bg-slate-900 overflow-hidden">
+      <table class="w-full">
+        <thead class="bg-slate-800">
+          <tr>
+            <th class="px-4 py-3 text-left text-sm font-medium text-slate-300">源URL</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-slate-300">文件名</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-slate-300">大小</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-slate-300">指纹</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-slate-300">创建时间</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-slate-300">过期时间</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-slate-300">下载次数</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-slate-300">可疑次数</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-700">
+          {{ range .links }}
+          <tr class="hover:bg-slate-800">
+            <td class="px-4 py-3 text-sm">
+              <div class="max-w-xs truncate" title="{{ .SourceURL }}">{{ .SourceURL }}</div>
+            </td>
+            <td class="px-4 py-3 text-sm">{{ .Filename }}</td>
+            <td class="px-4 py-3 text-sm bytes-display" data-bytes="{{ .Size }}">{{ .Size }} B</td>
+            <td class="px-4 py-3 text-sm">
+              <code class="text-xs bg-slate-700 px-2 py-1 rounded">{{ .Fingerprint }}</code>
+            </td>
+            <td class="px-4 py-3 text-sm text-slate-400">{{ .CreatedAt.Format "2006-01-02 15:04" }}</td>
+            <td class="px-4 py-3 text-sm">
+              <span class="expire-status" data-expire="{{ .ExpireAt.Unix }}">
+                {{ .ExpireAt.Format "2006-01-02 15:04" }}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-sm">{{ .DownloadCount }}</td>
+            <td class="px-4 py-3 text-sm">
+              {{ if gt .SuspiciousCount 0 }}
+                <span class="text-red-400">{{ .SuspiciousCount }}</span>
+              {{ else }}
+                <span class="text-slate-400">0</span>
+              {{ end }}
+            </td>
+          </tr>
+          {{ end }}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 分页 -->
+    <div class="mt-6 flex justify-center">
+      <div class="flex space-x-2">
+        {{ if gt .page 1 }}
+        <a href="#" onclick="goToPage({{ .page }} - 1)" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-md">上一页</a>
+        {{ end }}
+        <span class="px-3 py-2 bg-slate-600 rounded-md">第 {{ .page }} 页</span>
+        <a href="#" onclick="goToPage({{ .page }} + 1)" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-md">下一页</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
+    
+    function goToPage(page) {
+      window.location.href = '?page=' + page;
+    }
+    
+    // 页面加载后格式化所有字节显示和过期状态
+    document.addEventListener('DOMContentLoaded', function() {
+      // 格式化字节
+      document.querySelectorAll('.bytes-display').forEach(function(el) {
+        const bytes = parseInt(el.getAttribute('data-bytes'));
+        el.textContent = formatBytes(bytes);
+      });
+      
+      // 设置过期状态颜色
+      const now = Math.floor(Date.now() / 1000);
+      document.querySelectorAll('.expire-status').forEach(function(el) {
+        const expireTime = parseInt(el.getAttribute('data-expire'));
+        if (expireTime < now) {
+          el.classList.add('text-red-400');
+        } else {
+          el.classList.add('text-green-400');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

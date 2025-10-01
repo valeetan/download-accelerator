@@ -4,9 +4,10 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
-	"fmt"
 	"net/url"
+	"path"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -58,20 +59,33 @@ func (s *LinkSigner) sign(payload string) string {
 	return base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(h.Sum(nil))
 }
 
-// BuildAbsolute 根据 BaseURL 拼接对外可访问链接
+// BuildAbsolute 规范化生成绝对URL：
+// 1) 若 signedPath 已是绝对URL，则直接返回
+// 2) 若 baseURL 存在，规范化拼接 baseURL + "/d?..."
 func BuildAbsolute(baseURL, signedPath string) string {
+	if isAbsURL(signedPath) {
+		return signedPath
+	}
 	if baseURL == "" {
 		return signedPath
 	}
-	return fmt.Sprintf("%s%s", stringsTrimRightSlash(baseURL), signedPath)
+	bu, err := url.Parse(baseURL)
+	if err != nil {
+		return baseURL + signedPath
+	}
+	sp, err := url.Parse(signedPath)
+	if err != nil {
+		return baseURL + signedPath
+	}
+	// 仅拼接路径，避免重复 host 片段
+	bu.Path = strings.TrimRight(bu.Path, "/")
+	if sp.Path != "" {
+		bu.Path = path.Join(bu.Path, sp.Path)
+	}
+	bu.RawQuery = sp.RawQuery
+	return bu.String()
 }
 
-func stringsTrimRightSlash(s string) string {
-	if len(s) == 0 {
-		return s
-	}
-	if s[len(s)-1] == '/' {
-		return s[:len(s)-1]
-	}
-	return s
+func isAbsURL(u string) bool {
+	return strings.HasPrefix(u, "http://") || strings.HasPrefix(u, "https://")
 }

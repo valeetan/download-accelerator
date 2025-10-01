@@ -3,4 +3,18 @@ addr: ":8080"
 signingKey: "change-me"
 tokenTTL: "3h"    # 支持 Go duration 格式，如 90m、24h
 baseURL: ""       # 如 https://dl.example.com
+dbPath: "data/app.db"
+httpTimeout: "15s"
+maxConcurrent: 16
+
+# 管理员账号（首次启动时创建）
+adminUser: "admin"
+adminPass: "your-secure-password"
+
+# 限速配置
+throttleBps: 0    # 代理下载限速，字节/秒，0表示不限速
+
+# 指纹限制策略
+fingerprintLimitPerHour: 10    # 每指纹每小时生成链接限制
+restrictToSameFingerprint: false  # 是否仅允许同指纹下载
 
